@@ -1,47 +1,63 @@
-﻿using JetBrains.Annotations;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlatformGenerator : MonoBehaviour {
 
     public GameObject Platform;
-    public GameObject[] Platforms;
     public Transform GenerationPoint;
-    public ObjectPooler ObjectPool;
+    public ObjectPooler[] ObjectPools;
+    public Transform maxHeightPoint;
 
     public float DistanceBetween;
-    public float distanceBetweenMin;
-    public float distanceBetweenMax;
-    
+    public float DistanceBetweenMin;
+    public float DistanceBetweenMax;
+    public float MaxHeightChange;
+
     private float platformWidth;
     private int platformSelector;
+    private float minPlatformHeight;
+    private float maxPlatformHeight;
+    private float heightChange;
     private float[] plaformWidths;
 
-    [UsedImplicitly]
     void Start () {
-        plaformWidths = new float[Platforms.Length];
+        plaformWidths = new float[ObjectPools.Length];
 
-        for (int i = 0; i < Platforms.Length; i++)
+        for (int i = 0; i < ObjectPools.Length; i++)
         {
-            plaformWidths[i] = Platforms[i].GetComponent<BoxCollider2D>().size.x;
+            plaformWidths[i] = ObjectPools[i].PoolObject.GetComponent<BoxCollider2D>().size.x;
         }
+
+        minPlatformHeight = transform.position.y;
+        maxPlatformHeight = maxHeightPoint.position.y;
     }
 	
-    [UsedImplicitly]
 	void Update () {
 		if(transform.position.x < GenerationPoint.position.x)
         {
-            DistanceBetween = Random.Range(distanceBetweenMin, distanceBetweenMax);
-            platformSelector = Random.Range(0, Platforms.Length);
+            DistanceBetween = Random.Range(DistanceBetweenMin, DistanceBetweenMax);
+            platformSelector = Random.Range(0, ObjectPools.Length);
 
-            transform.position = new Vector3(transform.position.x + plaformWidths[platformSelector] + DistanceBetween, transform.position.y, transform.position.z);
+            heightChange = transform.position.y + Random.Range(-MaxHeightChange, MaxHeightChange);
 
-            Instantiate(Platforms[platformSelector], transform.position, transform.rotation);
-            //var newPlatform = ObjectPool.GetPooledObject();
+            if(heightChange > maxPlatformHeight)
+            {
+                heightChange = maxPlatformHeight;
+            }
+            else if(heightChange < minPlatformHeight)
+            {
+                heightChange = minPlatformHeight;
+            }
 
-            //newPlatform.transform.position = transform.position;
-            //newPlatform.transform.rotation = transform.rotation;
+            transform.position = new Vector3(transform.position.x + (plaformWidths[platformSelector] / 2) + DistanceBetween, heightChange, transform.position.z);
 
-            //newPlatform.SetActive(true);
+            var newPlatform = ObjectPools[platformSelector].GetPooledObject();
+
+            newPlatform.transform.position = transform.position;
+            newPlatform.transform.rotation = transform.rotation;
+
+            newPlatform.SetActive(true);
+
+            transform.position = new Vector3(transform.position.x + (plaformWidths[platformSelector] / 2), transform.position.y, transform.position.z);
         }
     }
 }

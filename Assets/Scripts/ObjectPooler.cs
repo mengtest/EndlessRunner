@@ -4,9 +4,9 @@ using UnityEngine;
 public class ObjectPooler : MonoBehaviour {
 
     public GameObject PoolObject;
-    public int PoolAmount;
     public List<GameObject> PooledObjects;
-
+    public int PoolAmount;
+    
 	void Start () {
         PooledObjects = new List<GameObject>();
 
