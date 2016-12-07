@@ -7,10 +7,13 @@ public class PlatformGenerator : MonoBehaviour {
     public ObjectPooler[] ObjectPools;
     public Transform maxHeightPoint;
 
+    private CoinGenerator coinGenerator;
+
     public float DistanceBetween;
     public float DistanceBetweenMin;
     public float DistanceBetweenMax;
     public float MaxHeightChange;
+    public float RandomCoingThreshold;
 
     private float platformWidth;
     private int platformSelector;
@@ -20,6 +23,8 @@ public class PlatformGenerator : MonoBehaviour {
     private float[] plaformWidths;
 
     void Start () {
+        coinGenerator = FindObjectOfType<CoinGenerator>();
+
         plaformWidths = new float[ObjectPools.Length];
 
         for (int i = 0; i < ObjectPools.Length; i++)
@@ -54,9 +59,13 @@ public class PlatformGenerator : MonoBehaviour {
 
             newPlatform.transform.position = transform.position;
             newPlatform.transform.rotation = transform.rotation;
-
             newPlatform.SetActive(true);
 
+            if(Random.Range(0, 100f) < RandomCoingThreshold)
+            {
+                coinGenerator.SpawnCoins(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z));
+            }
+            
             transform.position = new Vector3(transform.position.x + (plaformWidths[platformSelector] / 2), transform.position.y, transform.position.z);
         }
     }

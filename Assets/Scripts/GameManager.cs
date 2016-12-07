@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour {
     public Transform PlatformGenerator;
     public PlayerController Player;
 
+    private ScoreManager scoreManager;
+
     private Vector3 platformStartPoint;
     private Vector3 playerStartPoint;
 
@@ -17,6 +19,7 @@ public class GameManager : MonoBehaviour {
     {
         platformStartPoint = PlatformGenerator.position;
         playerStartPoint = Player.transform.position;
+        scoreManager = FindObjectOfType<ScoreManager>();
     }
 
     public void RestartGame()
@@ -26,6 +29,8 @@ public class GameManager : MonoBehaviour {
 
     public IEnumerator RestartGameCo()
     {
+        scoreManager.ScoreIncreasing = false;
+
         Player.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(0.5f);
@@ -41,5 +46,8 @@ public class GameManager : MonoBehaviour {
         PlatformGenerator.position = platformStartPoint;
 
         Player.gameObject.SetActive(true);
+
+        scoreManager.ScoreCount = 0;
+        scoreManager.ScoreIncreasing = true;
     }
 }
