@@ -24,6 +24,9 @@ public class PlayerController : MonoBehaviour {
     private float speedMilestoneCountStore;
     private float speedIncreaseMilestoneStore;
 
+    private bool stoppedJumping;
+    private bool canDoubleJump;
+
     void Start () {
         playerRigidBody = GetComponent<Rigidbody2D>();
         playerAnimator = GetComponent<Animator>();
@@ -33,28 +36,44 @@ public class PlayerController : MonoBehaviour {
         moveSpeedStore = MoveSpeed;
         speedMilestoneCountStore = speedMilestoneCount;
         speedIncreaseMilestoneStore = SpeedIncreaseMilestone;
+        stoppedJumping = true;
     }
-	
-	void Update () {
+
+    void Update()
+    {
         Grounded = Physics2D.OverlapCircle(GroundCheck.position, GroundCheckRadious, GroundLayer);
 
-        if(transform.position.x > speedMilestoneCount)
+        if (transform.position.x > speedMilestoneCount)
         {
             speedMilestoneCount += SpeedIncreaseMilestone;
             MoveSpeed = MoveSpeed * SpeedMultiplier;
-            SpeedIncreaseMilestone = SpeedIncreaseMilestone * SpeedMultiplier;          
+            SpeedIncreaseMilestone = SpeedIncreaseMilestone * SpeedMultiplier;
         }
 
         playerRigidBody.velocity = new Vector2(MoveSpeed, playerRigidBody.velocity.y);
 
-        if (Input.GetKeyDown(KeyCode.Space) && Grounded)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            playerRigidBody.velocity = new Vector2(playerRigidBody.velocity.x, JumpForce);
+            if (Grounded)
+            {
+                playerRigidBody.velocity = new Vector2(playerRigidBody.velocity.x, JumpForce);
+                stoppedJumping = false;
+            }
+
+            if(!Grounded && canDoubleJump)
+            {
+                playerRigidBody.velocity = new Vector2(playerRigidBody.velocity.x, JumpForce);
+
+                jumpTimeCounter = JumpTime;
+
+                canDoubleJump = false;
+                stoppedJumping = false;
+            }
         }
 
-        if (Input.GetKey(KeyCode.Space) && !Grounded)
+        if (Input.GetKey(KeyCode.Space) && !Grounded && !stoppedJumping)
         {
-            if(jumpTimeCounter > 0)
+            if (jumpTimeCounter > 0)
             {
                 playerRigidBody.velocity = new Vector2(playerRigidBody.velocity.x, JumpForce);
                 jumpTimeCounter -= Time.deltaTime;
@@ -63,17 +82,19 @@ public class PlayerController : MonoBehaviour {
 
         if (Input.GetKeyUp(KeyCode.Space))
         {
-                jumpTimeCounter = 0;
+            jumpTimeCounter = 0;
+            stoppedJumping = true;
         }
 
         if (Grounded)
         {
             jumpTimeCounter = JumpTime;
+            canDoubleJump = true;
         }
 
         playerAnimator.SetBool("Grounded", Grounded);
         playerAnimator.SetFloat("Speed", playerRigidBody.velocity.x);
-	}
+    }
 
     void OnCollisionEnter2D(Collision2D other)
     {

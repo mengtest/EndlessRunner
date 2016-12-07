@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour {
 
     public Transform PlatformGenerator;
     public PlayerController Player;
+    public DeathMenu TheDeathMenu;
 
     private ScoreManager scoreManager;
 
@@ -24,16 +25,15 @@ public class GameManager : MonoBehaviour {
 
     public void RestartGame()
     {
-        StartCoroutine("RestartGameCo");
-    }
-
-    public IEnumerator RestartGameCo()
-    {
         scoreManager.ScoreIncreasing = false;
-
         Player.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(0.5f);
+        TheDeathMenu.gameObject.SetActive(true);
+    }
+
+    public void ResetPlayer()
+    {
+        TheDeathMenu.gameObject.SetActive(false);
 
         platformList = FindObjectsOfType<PlatformDestroyer>();
 
