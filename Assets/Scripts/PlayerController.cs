@@ -6,6 +6,9 @@ public class PlayerController : MonoBehaviour {
     public Transform GroundCheck;
     public GameManager TheGameManager;
 
+    public AudioSource JumpSound;
+    public AudioSource DeathSound;
+
     public float GroundCheckRadious;
     public float SpeedMultiplier;
     public float SpeedIncreaseMilestone;
@@ -58,9 +61,12 @@ public class PlayerController : MonoBehaviour {
             {
                 playerRigidBody.velocity = new Vector2(playerRigidBody.velocity.x, JumpForce);
                 stoppedJumping = false;
+                canDoubleJump = true;
+
+                JumpSound.Play();
             }
 
-            if(!Grounded && canDoubleJump)
+            if (!Grounded && canDoubleJump)
             {
                 playerRigidBody.velocity = new Vector2(playerRigidBody.velocity.x, JumpForce);
 
@@ -68,10 +74,12 @@ public class PlayerController : MonoBehaviour {
 
                 canDoubleJump = false;
                 stoppedJumping = false;
+
+                JumpSound.Play();
             }
         }
 
-        if (Input.GetKey(KeyCode.Space) && !Grounded && !stoppedJumping)
+        if (Input.GetKey(KeyCode.Space) && !stoppedJumping)
         {
             if (jumpTimeCounter > 0)
             {
@@ -89,7 +97,6 @@ public class PlayerController : MonoBehaviour {
         if (Grounded)
         {
             jumpTimeCounter = JumpTime;
-            canDoubleJump = true;
         }
 
         playerAnimator.SetBool("Grounded", Grounded);
@@ -100,6 +107,8 @@ public class PlayerController : MonoBehaviour {
     {
         if (other.gameObject.tag == "KillBox")
         {
+            DeathSound.Play();
+
             TheGameManager.RestartGame();
 
             MoveSpeed = moveSpeedStore;

@@ -5,6 +5,7 @@ public class PlatformGenerator : MonoBehaviour {
     public GameObject Platform;
     public Transform GenerationPoint;
     public ObjectPooler[] ObjectPools;
+    public ObjectPooler SpikePool;
     public Transform maxHeightPoint;
 
     private CoinGenerator coinGenerator;
@@ -14,6 +15,7 @@ public class PlatformGenerator : MonoBehaviour {
     public float DistanceBetweenMax;
     public float MaxHeightChange;
     public float RandomCoingThreshold;
+    public float RandomSpikeThreshold;
 
     private float platformWidth;
     private int platformSelector;
@@ -63,9 +65,21 @@ public class PlatformGenerator : MonoBehaviour {
 
             if(Random.Range(0, 100f) < RandomCoingThreshold)
             {
-                coinGenerator.SpawnCoins(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z));
+                coinGenerator.SpawnCoins(new Vector3(transform.position.x, transform.position.y + 1.5f, transform.position.z));
             }
-            
+
+            if (Random.Range(0, 100f) < RandomSpikeThreshold)
+            {
+                var newSpike = SpikePool.GetPooledObject();
+                var spikeXPosition = Random.Range(-plaformWidths[platformSelector] / 2f + 1f, plaformWidths[platformSelector] / 2f - 1f);
+                var spikePosition = new Vector3(spikeXPosition, 0.5f, 0f);
+
+                newSpike.transform.position = transform.position + spikePosition;
+                newSpike.transform.rotation = transform.rotation;
+
+                newSpike.SetActive(true);
+            }
+
             transform.position = new Vector3(transform.position.x + (plaformWidths[platformSelector] / 2), transform.position.y, transform.position.z);
         }
     }
