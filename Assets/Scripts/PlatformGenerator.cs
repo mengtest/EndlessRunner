@@ -6,6 +6,7 @@ public class PlatformGenerator : MonoBehaviour {
     public Transform GenerationPoint;
     public ObjectPooler[] ObjectPools;
     public ObjectPooler SpikePool;
+    public ObjectPooler PowerupPool;
     public Transform maxHeightPoint;
 
     private CoinGenerator coinGenerator;
@@ -16,6 +17,9 @@ public class PlatformGenerator : MonoBehaviour {
     public float MaxHeightChange;
     public float RandomCoingThreshold;
     public float RandomSpikeThreshold;
+    public float RandomPowerupThreshold;
+    public float PowerupHeight;
+    public bool ShouldCreateSpikes;
 
     private float platformWidth;
     private int platformSelector;
@@ -36,6 +40,8 @@ public class PlatformGenerator : MonoBehaviour {
 
         minPlatformHeight = transform.position.y;
         maxPlatformHeight = maxHeightPoint.position.y;
+
+        ShouldCreateSpikes = true;
     }
 	
 	void Update () {
@@ -57,6 +63,16 @@ public class PlatformGenerator : MonoBehaviour {
 
             transform.position = new Vector3(transform.position.x + (plaformWidths[platformSelector] / 2) + DistanceBetween, heightChange, transform.position.z);
 
+            if (Random.Range(0, 100f) < RandomPowerupThreshold)
+            {
+                var newPowerup = PowerupPool.GetPooledObject();
+
+                newPowerup.transform.position = transform.position + new Vector3(DistanceBetween / 2, Random.Range(PowerupHeight / 2, PowerupHeight), 0f);
+                newPowerup.transform.rotation = transform.rotation;
+
+                newPowerup.SetActive(true);
+            }
+
             var newPlatform = ObjectPools[platformSelector].GetPooledObject();
 
             newPlatform.transform.position = transform.position;
@@ -68,7 +84,7 @@ public class PlatformGenerator : MonoBehaviour {
                 coinGenerator.SpawnCoins(new Vector3(transform.position.x, transform.position.y + 1.5f, transform.position.z));
             }
 
-            if (Random.Range(0, 100f) < RandomSpikeThreshold)
+            if ((Random.Range(0, 100f) < RandomSpikeThreshold) && ShouldCreateSpikes)
             {
                 var newSpike = SpikePool.GetPooledObject();
                 var spikeXPosition = Random.Range(-plaformWidths[platformSelector] / 2f + 1f, plaformWidths[platformSelector] / 2f - 1f);

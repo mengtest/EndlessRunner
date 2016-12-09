@@ -1,12 +1,12 @@
-﻿using System.Collections;
-using JetBrains.Annotations;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
     public Transform PlatformGenerator;
     public PlayerController Player;
     public DeathMenu TheDeathMenu;
+
+    public bool PowerupReset;
 
     private ScoreManager scoreManager;
 
@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour {
 
     private PlatformDestroyer[] platformList;
 
-    [UsedImplicitly]
     void Start ()
     {
         platformStartPoint = PlatformGenerator.position;
@@ -49,5 +48,7 @@ public class GameManager : MonoBehaviour {
 
         scoreManager.ScoreCount = 0;
         scoreManager.ScoreIncreasing = true;
+
+        PowerupReset = true;
     }
 }
